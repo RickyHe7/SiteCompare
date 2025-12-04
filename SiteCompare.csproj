@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\StdfLab.Core\StdfLab.Core.csproj" />
+		<ProjectReference Include="..\StdfLab.Extensions\StdfLab.Extensions.csproj" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+	  <Exec Command="xcopy /Y /E &quot;$(TargetDir)*.*&quot; &quot;C:\ProgramData\StdfLab\Extensions\SiteError&quot;" />
+	</Target>
+
+</Project>
