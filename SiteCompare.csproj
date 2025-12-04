@@ -8,9 +8,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\StdfLab.Core\StdfLab.Core.csproj" />
-		<ProjectReference Include="..\StdfLab.Extensions\StdfLab.Extensions.csproj" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="StdfLab.Core">
+	    <HintPath>..\StdfLab\StdfLab.Core\bin\Debug\net10.0\StdfLab.Core.dll</HintPath>
+	  </Reference>
+	  <Reference Include="StdfLab.Extensions">
+	    <HintPath>..\StdfLab\StdfLab.Extensions\bin\Debug\net10.0-windows\StdfLab.Extensions.dll</HintPath>
+	  </Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

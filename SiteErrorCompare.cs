@@ -9,7 +9,6 @@ public class SiteErrorCompare(IDataFactory dataFactory, IDialogService dialogSer
     private readonly IDataFactory _dataFactory = dataFactory;
     private readonly IDialogService _dialogService = dialogService;
 
-    public event EventHandler<PluginEventArgs> MessageRecieved;
 
     public string Name => "SiteCompare";
 

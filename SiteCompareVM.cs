@@ -28,8 +28,6 @@ public partial class SiteCompareVM : ObservableObject
 
     public string PluginName => "SiteCompare";
 
-    public static event EventHandler<PluginEventArgs>? MessageRecieved;
-
     public event EventHandler? DataProcessCompleted;
 
     public SiteCompareVM(IDataFactory dataFactory, IDialogService dialogService)
@@ -61,6 +59,7 @@ public partial class SiteCompareVM : ObservableObject
 
         if (selectedFiles.Count == 0)
             return;
+
         if (selectedFiles.GroupBy(f => f.SiteNum).Any(g => g.Count() > 1))
         {
             _dialogService.ShowError("Please select only one site for each file.");
@@ -69,57 +68,28 @@ public partial class SiteCompareVM : ObservableObject
 
         var dt = new DataTable();
 
-        dt.Columns.Add("Index", typeof(string));
-        dt.Columns.Add("TestId", typeof(string));
-        dt.Columns.Add("TestName", typeof(string));
-        dt.Columns.Add("Unit", typeof(string));
-        dt.Columns.Add("LowLimit", typeof(float));
-        dt.Columns.Add("HighLimit", typeof(float));
-
-        var siteNumbers = new List<int>();
-
-        foreach (var (i, pickData) in selectedFiles.Index())
+        try
         {
-            if (pickData.SiteNum is null || pickData.FileData is null)
-                continue;
-            var siteNum = pickData.SiteNum.Value;
-            var fileData = pickData.FileData;
-            dt.Columns.Add($"S{siteNum}_Mean", typeof(float));
-            siteNumbers.Add(siteNum);
-        }
+            dt.Columns.Add("Index", typeof(string));
+            dt.Columns.Add("TestId", typeof(string));
+            dt.Columns.Add("TestName", typeof(string));
+            dt.Columns.Add("Unit", typeof(string));
+            dt.Columns.Add("LowLimit", typeof(float));
+            dt.Columns.Add("HighLimit", typeof(float));
 
-        siteNumbers.Sort();
+            var siteNumbers = new List<int>();
 
-        for (int i = 0; i < siteNumbers.Count; i++)
-        {
-            for (int j = i + 1; j < siteNumbers.Count; j++)
-            {
-                int site1 = siteNumbers[i];
-                int site2 = siteNumbers[j];
-
-                dt.Columns.Add($"S{site1}_vs_S{site2}_Diff", typeof(float));
-            }
-        }
-
-        foreach (var item in FileDataList.First().FileData!.TestItemStatisticInfo)
-        {
-            var testItem = item.Value;
-            DataRow row = dt.NewRow();
-            row["Index"] = testItem.Index;
-            row["TestId"] = testItem.TestId;
-            row["TestName"] = testItem.TestName;
-            row["Unit"] = testItem.Unit;
-            row["LowLimit"] = testItem.LowLimit;
-            row["HighLimit"] = testItem.HighLimit;
-
-            foreach (var (i, pickData) in FileDataList.Index())
+            foreach (var (i, pickData) in selectedFiles.Index())
             {
                 if (pickData.SiteNum is null || pickData.FileData is null)
                     continue;
                 var siteNum = pickData.SiteNum.Value;
                 var fileData = pickData.FileData;
-                row[$"S{siteNum}_Mean"] = testItem.SiteStatiscsInfo[(int)siteNum].Mean;
+                dt.Columns.Add($"S{siteNum}_Mean", typeof(float));
+                siteNumbers.Add(siteNum);
             }
+
+            siteNumbers.Sort();
 
             for (int i = 0; i < siteNumbers.Count; i++)
             {
@@ -127,13 +97,62 @@ public partial class SiteCompareVM : ObservableObject
                 {
                     int site1 = siteNumbers[i];
                     int site2 = siteNumbers[j];
-                    row[$"S{site1}_vs_S{site2}_Diff"] =
-                        (float)row[$"S{site1}_Mean"] - (float)row[$"S{site2}_Mean"];
+
+                    dt.Columns.Add($"S{site1}_vs_S{site2}_Diff", typeof(float));
                 }
             }
 
-            dt.Rows.Add(row);
+            var firstFileData = selectedFiles.First().FileData;
+
+            foreach (var item in firstFileData!.TestItemStatisticInfo)
+            {
+                if (
+                    selectedFiles.Any(f =>
+                        f.FileData.TestItemsInfo[item.Key].TestName != item.Value.TestName
+                    )
+                )
+                {
+                    _dialogService.ShowError("Please select files with same test items.");
+                    return;
+                }
+
+                var testItem = item.Value;
+                DataRow row = dt.NewRow();
+                row["Index"] = testItem.Index;
+                row["TestId"] = testItem.TestId;
+                row["TestName"] = testItem.TestName;
+                row["Unit"] = testItem.Unit;
+                row["LowLimit"] = testItem.LowLimit;
+                row["HighLimit"] = testItem.HighLimit;
+
+                foreach (var (i, pickData) in FileDataList.Index())
+                {
+                    if (pickData.SiteNum is null || pickData.FileData is null)
+                        continue;
+                    var siteNum = pickData.SiteNum.Value;
+                    var fileData = pickData.FileData;
+                    row[$"S{siteNum}_Mean"] = testItem.SiteStatiscsInfo[(int)siteNum].Mean;
+                }
+
+                for (int i = 0; i < siteNumbers.Count; i++)
+                {
+                    for (int j = i + 1; j < siteNumbers.Count; j++)
+                    {
+                        int site1 = siteNumbers[i];
+                        int site2 = siteNumbers[j];
+                        row[$"S{site1}_vs_S{site2}_Diff"] =
+                            (float)row[$"S{site1}_Mean"] - (float)row[$"S{site2}_Mean"];
+                    }
+                }
+
+                dt.Rows.Add(row);
+            }
         }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError(ex.Message);
+        }
+
         SiteErrorTable = dt;
     }
 }
