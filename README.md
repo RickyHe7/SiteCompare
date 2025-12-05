@@ -469,4 +469,3 @@ public partial class SiteCompareVM : ObservableObject
 1. 右键插件项目 → “生成”，确保编译通过，生成目标.dll文件（位于bin/Debug或bin/Release目录）。
 
 2. 在插件目录下新建文件夹，将输出目录下的dll复制到这里
-> （注：文档部分内容可能由 AI 生成）
