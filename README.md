@@ -79,7 +79,7 @@ SiteCompare 工程源码：https://github.com/RickyHe7/SiteCompare.git
 
 
 
-```Plain Text
+```csharp
 
 using StdfLab.Core;
 using StdfLab.Extensions;
