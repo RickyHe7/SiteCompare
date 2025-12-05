@@ -1,6 +1,5 @@
 using StdfLab.Core;
 using StdfLab.Extensions;
-using System.Windows;
 
 namespace SiteCompare;
 
@@ -22,7 +21,7 @@ public class SiteErrorCompare(IDataFactory dataFactory, IDialogService dialogSer
 
     public Task InitializeAsync()
     {
-        viewModel = new SiteCompareVM(_dataFactory,_dialogService);
+        viewModel = new SiteCompareVM(_dataFactory, _dialogService);
         return Task.CompletedTask;
     }
 

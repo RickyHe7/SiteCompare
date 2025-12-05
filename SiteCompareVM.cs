@@ -1,9 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Data;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using StdfLab.Core;
-using StdfLab.Extensions;
+using System.Collections.ObjectModel;
+using System.Data;
 
 namespace SiteCompare;
 
@@ -27,8 +26,6 @@ public partial class SiteCompareVM : ObservableObject
     public string ViewKey => "SiteCompare";
 
     public string PluginName => "SiteCompare";
-
-    public event EventHandler? DataProcessCompleted;
 
     public SiteCompareVM(IDataFactory dataFactory, IDialogService dialogService)
     {
